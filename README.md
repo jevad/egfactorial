@@ -1,6 +1,7 @@
 # Using the new Java parallel streaming classes
 
-On Christmas and New Year's Day, in between visiting with family, I created some code to try out the 
+On Christmas Day and on New Year's Day, in between visiting with family and friends, 
+I created some code to try out the 
 new Java 8 parallel streaming functionality.  I decided to try to calculate factorials as fast as I
 could in Java on my laptop.  You'll find that code in `FactorialParallelStream.java`.
 
