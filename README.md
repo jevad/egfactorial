@@ -64,7 +64,7 @@ parallel streaming implementation.  Calculating the factorial of 100000, 100 tim
 
 Surprisingly, FactorialFlexSplit does this by forking off a huge number of threads.  It will generate
 thousands to calculate the factorial of 100000.  Likewise, as far as I can tell, Java's parallel streaming
-generates many threads.  It appears that the JVM now has an Erlang-like ability to fork, juggle and joing
+generates many threads.  It appears that the JVM now has an Erlang-like ability to fork, juggle and join
 thousands of threads efficiently.  
 
 Next up:
