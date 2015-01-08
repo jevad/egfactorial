@@ -1,6 +1,6 @@
-**update:**  I will be giving a talk on Java 8 parallel streaming and the parallel performance of Oracle's JVM at the January Software Developer's Cartel.  So, over the next few week, I'll be adding some stuff here, including relative performance data and more commentary/annotations to get ready for the presenation.  I'll also put my slides up here or in another github project.
+**update:**  I will be giving a talk on Java 8 parallel streaming and the parallel performance of Oracle's JVM at the January Software Developer's Cartel.  If I have time, I'll also include some peformance comparisons with the Erlang VM and the Julia VM.  So, over the next few week, I'll be adding some stuff here, including relative performance data and more commentary/annotations to get ready for the presenation.  I'll also put my slides up here or in another github project.
 
-For those of you who are local, the January Software Developer's Cartel will be January 20th at the Grand Stafford Theater in downtown Bryan.  I'd enjoy seeing you there.  Admission is free, snacks are usually provided (free), and the bar will be open for drinks (*not* free -- and don't forget to tip your bartender).  Doors will open 4:30-ish and the talks will start at 6:30-ish (there are usually two or three talks, with each talk lasting about a half hour).  I'll modify this information when more details are available.  As always, Grand Stafford Bar Manager and Chief Mixologist, Cody Schilling, will have some special Tuesday evening craft cocktails planned -- I'm sure my presentation will sound much better if you get there early and consume a few delicious cocktails prior to the talk.  :)
+For those of you who are local, the January Software Developer's Cartel will be January 20th at the Grand Stafford Theater in downtown Bryan.  I'd enjoy seeing you there.  Admission is free, snacks are usually provided (free), and the bar will be open for drinks (*not* free -- and don't forget to tip your bartender).  Doors will open 4:30-ish and the talks will start at 6:30-ish (there are usually two or three talks, with each talk lasting about a half hour).  I'll modify this information when more details are available.  As always, Grand Stafford Bar Manager and Chief Mixologist, Cody Schilling, will have some special Tuesday evening feature craft cocktails planned -- I'm sure my presentation will sound much better if you get there early and consume a few delicious craft cocktails prior to the talk.  :)
 
 # Using the new Java parallel streaming classes
 
@@ -41,6 +41,8 @@ Surprisingly, `FactorialFlexSplit` does this by forking off a huge number of thr
 Next up:
 
 * Re-implement the Python implementation using the Disco framework to see how it peforms ( [http://discoproject.org](http://discoproject.org) ).  (note:  Although the Disco framework is written for Python, it is written *in* Erlang and runs on the Erlang VM.) 
+
+* Memory usage statistics.
 
 * Up the number of threads used in `FactorialSkipAlgorithm` to see what happens. 
 
