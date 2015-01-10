@@ -1,12 +1,12 @@
 % This is just here as a "sanity check".
-% This program is so simple, that *know* 
+% This program is so simple, that I *know* 
 % the algorithm is correct "by inspection",
 % so I can check other algorithms to make 
 % sure that the output is correct.
 
-% copyright/rights: none.  The author is
-% assuming that this is so obvious
-% that it is 'public domain'.
+% .TODO. Write a factorial in Erlang or 
+% Elixir that calculates in parallel, to
+% compare to the Java versions.
 
 -module(factorial).
 -export([fac/1]).
