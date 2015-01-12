@@ -18,7 +18,7 @@ public class FactorialParallelStream {
 			public BigInteger apply(BigInteger b) {
 				return BigInteger.ONE.add(b);
 			}
-		}).limit(facme.longValue());
+		}).limit(facme.longValue()).parallel();
 	}
 
 	private static Stream<BigInteger> takesForever(final BigInteger facme) {
@@ -39,7 +39,7 @@ public class FactorialParallelStream {
 			public boolean test(final BigInteger b) {
 				return b.compareTo(facme) <= 0;
 			}
-		});
+		}).parallel();
 	}
 
 	private static Stream<BigInteger> streamOfBigIntegerUpTo(
