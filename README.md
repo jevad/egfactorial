@@ -2,7 +2,7 @@
 
 For those of you who are local, the January Software Developers' Cartel will be January 20th at its usual home -- the Grand Stafford Theater in downtown Bryan.  I'd enjoy seeing you there.  For those who have not been to the Software Developers' Cartel before:  Admission is free, snacks are usually provided (free), and the bar will be open for drinks (*not* free -- and don't forget to tip your bartender).  Doors will open at 5:30-ish and the talks will start at 6:30-ish (There will be one other speaker besides me -- TAMU Aerospace Engineering Ph.D. candidate, Saurav Agarwal, will speak on "The Decade of the Drone".  There is no fixed time limit for the talks, but the target time is about 30 minutes each.).  As always, Grand Stafford Bar Manager and Chief Mixologist, Cody Schilling, will have some special Tuesday evening feature craft cocktails planned -- I'm sure my presentation will sound much better if you get there early and consume a few delicious craft cocktails prior to the talk.  :)
 
-**update:** Another sample set of code that I'll be using for that presentation may be found here:  [https://github.com/jevad/egmontyhall](https://github.com/jevad/egmontyhall) .
+**update:** Another sample set of code that I'll be using for that presentation may be found here:  [https://github.com/jevad/egmontyhall](https://github.com/jevad/egmontyhall) .  I haven't yet annotated that code (as of 11 January 2015), but that should be coming soon.  The code solves the "Monty Hall" problem by simulation.
 
 # Using the new Java parallel streaming classes
 
