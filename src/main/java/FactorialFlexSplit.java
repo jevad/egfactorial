@@ -9,7 +9,7 @@ public class FactorialFlexSplit {
 
 	// Adjust the value of MULT_LIMIT to adjust the parallelism --
 	// results tend to be surprising. The smaller MULT_LIMIT * PISM,
-	// the greater the parallelism.  (Alternatively, directly adjust
+	// the greater the parallelism. (Alternatively, directly adjust
 	// the value of limitCalc, in fac() below.)
 
 	// private static final BigInteger MULT_LIMIT = BigInteger.valueOf(300L);
@@ -81,7 +81,8 @@ public class FactorialFlexSplit {
 		}
 	}
 
-	public static BigInteger fac(final BigInteger facme) {
+	public static BigInteger fac(final BigInteger facme,
+			final BigInteger limitMultiplier) {
 		if (null == facme || BigInteger.ZERO.compareTo(facme) > 0) {
 			throw new IllegalArgumentException(
 					"no factorials for negative or undefined numbers");
@@ -93,7 +94,7 @@ public class FactorialFlexSplit {
 		} else if (TWO.equals(facme)) {
 			reply = TWO;
 		} else {
-			final BigInteger limitCalc = MULT_LIMIT.multiply(PISM);
+			final BigInteger limitCalc = limitMultiplier.multiply(PISM);
 			// The limit needs to be at least 2.
 			final BigInteger limit = TWO.compareTo(limitCalc) >= 0 ? TWO
 					: limitCalc;
@@ -115,6 +116,10 @@ public class FactorialFlexSplit {
 		}
 
 		return reply;
+	}
+
+	public static BigInteger fac(final BigInteger facMe) {
+		return fac(facMe, MULT_LIMIT);
 	}
 
 	public static void main(final String[] argv) {

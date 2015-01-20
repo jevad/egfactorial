@@ -1,7 +1,12 @@
 // default package
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryPoolMXBean;
+import java.lang.management.ThreadMXBean;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class TimeThem {
@@ -42,6 +47,19 @@ public class TimeThem {
 		return end - start;
 	}
 
+	public static long timeIt(
+			final BiFunction<BigInteger, BigInteger, BigInteger> func,
+			final BigInteger facme, final int count, final BigInteger multiplier) {
+		final long start = System.currentTimeMillis();
+
+		for (int i = count; 0 < i; --i) {
+			func.apply(facme, multiplier);
+		}
+
+		final long end = System.currentTimeMillis();
+		return end - start;
+	}
+
 	/**
 	 * Runs each of our factorial calculators and verifies that, for the same
 	 * target value, they return the same factorial value.
@@ -55,24 +73,19 @@ public class TimeThem {
 
 		System.out.println("testing consistency");
 		for (BigInteger val : testValues) {
-			final BigInteger fstResult = verifyIt(FactorialSingleThread::fac,
-					val);
 			final BigInteger skipResult = verifyIt(FactorialSkipAlgorithm::fac,
 					val);
 			final BigInteger ffResult = verifyIt(FactorialFlexSplit::fac, val);
 			final BigInteger strmResult = verifyIt(
 					FactorialParallelStream::fac, val);
 
-			if (fstResult.equals(skipResult) && skipResult.equals(ffResult)
-					&& ffResult.equals(strmResult)) {
-				// System.out.println("all tests agree that " + val
-				// + " factorial is " + strmResult);
+			if (skipResult.equals(ffResult) && ffResult.equals(strmResult)) {
 				System.out.println("all tests agree on factorial for " + val);
 			} else {
 				areConsistent = false;
 				System.out.println("inconsistent results for " + val
-						+ " factorial: " + fstResult + ", " + skipResult + ", "
-						+ ffResult + ", " + strmResult);
+						+ " factorial: " + skipResult + ", " + ffResult + ", "
+						+ strmResult);
 			}
 		}
 
@@ -134,6 +147,80 @@ public class TimeThem {
 		}
 	}
 
+	private static void adjustParallelizationOp(final int iterationCount,
+			final BigInteger val, final BigInteger multiplier) {
+		takeabreak();
+		System.out.println("     relative result for p-multiplier of "
+				+ multiplier
+				+ ": "
+				+ timeIt(FactorialFlexSplit::fac, val, iterationCount,
+						multiplier));
+
+	}
+
+	private static final long totalMemoryUsageAndReset(
+			final List<MemoryPoolMXBean> m) {
+		long runningTotal = 0;
+		for (MemoryPoolMXBean b : m) {
+			runningTotal += b.getUsage().getUsed();
+			// .WARNING. side effect
+			b.resetPeakUsage();
+		}
+		return runningTotal;
+	}
+
+	public static void adjustParallelization(final int iterationCount,
+			final BigInteger val) {
+		System.out.println("running tests with different parallelization, "
+				+ "using flex forking factorial");
+
+		long[] mutliplierDivisors = { 1L, 2L, 4L, 8L, 16L, 32L, 64L, 128L,
+				256L, 512L, 1024L, 2048L, 4096L, 8192L, 16384L, 32768L };
+
+		for (long i : mutliplierDivisors) {
+			takeabreak();
+			adjustParallelizationOp(iterationCount, val, BigInteger.valueOf(i));
+		}
+
+	}
+
+	public static void resourceUsageImpl(
+			final Function<BigInteger, BigInteger> func,
+			final int iterationCount, final BigInteger val) {
+		takeabreak();
+		takeabreak();
+
+		ThreadMXBean t = ManagementFactory.getThreadMXBean();
+		final long startingMemoryUsage = totalMemoryUsageAndReset(ManagementFactory
+				.getMemoryPoolMXBeans());
+		final int startingThreadCount = t.getThreadCount();
+		t.resetPeakThreadCount();
+
+		timeIt(func, val, iterationCount);
+
+		final int peakThreadCount = t.getPeakThreadCount();
+		final long peakMemoryUsage = ManagementFactory.getMemoryPoolMXBeans()
+				.stream().mapToLong(i -> i.getPeakUsage().getUsed()).sum();
+		System.out.println("     starting Memory: " + startingMemoryUsage);
+		System.out.println("     peak Memory: " + peakMemoryUsage);
+		System.out.println("     Memory increase: "
+				+ (peakMemoryUsage - startingMemoryUsage));
+		System.out
+				.println("     starting thread count: " + startingThreadCount);
+		System.out.println("     peak thread count: " + peakThreadCount);
+		System.out.println("     Thread increase: "
+				+ (peakThreadCount - startingThreadCount));
+
+	}
+
+	public static void resourceUsage(final int iterationCount,
+			final BigInteger val) {
+		System.out.println("resource usage for parallel streaming");
+		resourceUsageImpl(FactorialParallelStream::fac, iterationCount, val);
+		System.out.println("resource usage for flex forking factorial");
+		resourceUsageImpl(FactorialFlexSplit::fac, iterationCount, val);
+	}
+
 	private static void printhelp() {
 		System.out.println("The first argument (required) is the number "
 				+ "of iterations to run for each test.");
@@ -162,6 +249,16 @@ public class TimeThem {
 
 				if (areTestsConsistent(testValues)) {
 					compare(iterationCount, testValues);
+					BigInteger biggest = testValues.stream()
+							.max(new Comparator<BigInteger>() {
+								@Override
+								public int compare(BigInteger o1, BigInteger o2) {
+									return o1.compareTo(o2);
+								}
+							}).get();
+					adjustParallelization(10 < iterationCount ? 10
+							: iterationCount, biggest);
+					resourceUsage(iterationCount, biggest);
 				}
 			} catch (NumberFormatException nfe) {
 				printhelp();

@@ -76,8 +76,8 @@ public class FactorialSkipAlgorithm {
 			// This will be the number of tasks being run in parallel.
 			// You can play around with this to see what works better
 			// or worse on your hardware. Right now, I have it set to
-			// the number of available processors.
-			final BigInteger taskCount = PISM;
+			// twice the number of available processors.
+			final BigInteger taskCount = PISM.add(PISM);
 
 			// The default ForkJoinPool constructor creates a ForkJoinPool
 			// with parallelism equal to the number of available processors.
