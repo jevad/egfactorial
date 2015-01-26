@@ -7,7 +7,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.LongConsumer;
+import java.util.stream.LongStream;
 
 public class TimeThem {
 
@@ -181,6 +184,18 @@ public class TimeThem {
 			takeabreak();
 			adjustParallelizationOp(iterationCount, val, BigInteger.valueOf(i));
 		}
+		
+		LongStream.of(1L, 2L, 4L, 8L, 16L, 32L, 64L, 128L,
+				256L, 512L, 1024L, 2048L, 4096L, 8192L, 16384L, 32768L).forEach(
+						new LongConsumer() {
+
+							@Override
+							public void accept(long i) {
+								takeabreak();
+								adjustParallelizationOp(iterationCount, val, BigInteger.valueOf(i));
+							}
+							
+						});
 
 	}
 
@@ -249,16 +264,32 @@ public class TimeThem {
 
 				if (areTestsConsistent(testValues)) {
 					compare(iterationCount, testValues);
-					BigInteger biggest = testValues.stream()
-							.max(new Comparator<BigInteger>() {
+					testValues.stream()
+							.max(/*new Comparator<BigInteger>() {
 								@Override
 								public int compare(BigInteger o1, BigInteger o2) {
 									return o1.compareTo(o2);
 								}
-							}).get();
-					adjustParallelization(10 < iterationCount ? 10
-							: iterationCount, biggest);
-					resourceUsage(iterationCount, biggest);
+							}*/ (left, right) -> left.compareTo(right)).
+							ifPresent(new Consumer<BigInteger>() {
+								@Override
+								public void accept(BigInteger t) {
+									// TODO Auto-generated method stub
+									adjustParallelization(10 < iterationCount ? 10
+											: iterationCount, t);
+									resourceUsage(iterationCount, t);
+								};								
+							});
+//					BigInteger biggest = testValues.stream()
+//							.max(new Comparator<BigInteger>() {
+//								@Override
+//								public int compare(BigInteger o1, BigInteger o2) {
+//									return o1.compareTo(o2);
+//								}
+//							}).get();
+//					adjustParallelization(10 < iterationCount ? 10
+//							: iterationCount, biggest);
+//					resourceUsage(iterationCount, biggest);
 				}
 			} catch (NumberFormatException nfe) {
 				printhelp();
