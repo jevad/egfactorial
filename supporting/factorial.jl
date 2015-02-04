@@ -1,3 +1,8 @@
+const ZERO = BigInt(0)
+const ONE = BigInt(1)
+const TWO = BigInt(2)
+const THREE = BigInt(3)
+
 # the built in factorial function
 # used for sanity checks and so forth
 function house_fac(some_number::BigInt)
@@ -7,7 +12,7 @@ end
 # a simple looping factorial calculator
 # used for comparison
 function simple_fac(some_number::BigInt)
-  fac = BigInt(1)
+  fac = ONE
   if 0 > some_number
     throw(DomainError("Not in my house! $some_number"))
   elseif 2 <= some_number
@@ -25,8 +30,20 @@ end
 # but, unfortunately, this fails due to limitations
 # of the underlying libraries (as of Julia 0.3.5).
 function pfor_fac(some_number::BigInt)
-  fac = @parallel (*) for n = BigInt(1):some_number
+  fac = @parallel (*) for n = ONE:some_number
     temp = n
+  end
+  return fac
+end
+
+# If you want to limit yourself to calculating factorials for numbers
+# up to the size of the system-defined Int, you can do something
+# like this.  I tried it out, and it was slower by an order of magnitude
+# than the split-and-spawn algorithm in the next function.  I suspect that
+# the underlying system is splitting the work suboptimally.
+function pfor_fac_ltd(some_number)
+  fac = @parallel (*) for n = 1:some_number
+    temp = BigInt(n)
   end
   return fac
 end
@@ -34,11 +51,6 @@ end
 # This divides the work and spawns off said work onto different
 # threads, until the amount of work gets small enough.
 function calc_fac_impl(first::BigInt, last::BigInt, chk_sz::BigInt)
-  ZERO = BigInt(0)
-  ONE = BigInt(1)
-  TWO = BigInt(2)
-  THREE = BigInt(3)
-
   diff = last - first
   if ZERO > diff
     throw(ArgumentError("First greater than Last! $first, $last"))
@@ -63,37 +75,29 @@ function calc_fac_impl(first::BigInt, last::BigInt, chk_sz::BigInt)
     if ZERO != r
       mid = mid + ONE
     end
-    if first <= mid && (ONE + mid) <= last
-      f = @spawn calc_fac_impl(first, mid, chk_sz)
-      g = @spawn calc_fac_impl((ONE + mid), last, chk_sz)
-      return fetch(f)*fetch(g)
-    else
-      throw(ArgumentError("something amiss, $first, $inc, $last"))
-    end
+    f = @spawn calc_fac_impl(first, mid, chk_sz)
+    g = @spawn calc_fac_impl((ONE + mid), last, chk_sz)
+    return fetch(f)*fetch(g)
   end
 end
 
 function calc_fac(some_number::BigInt)
-  fac = BigInt(1) # default result, for 0 and 1, by definition
+  fac = ONE # default result, for 0 and 1, by definition
   if BigInt(0) > some_number
     throw(DomainError("Must be non-negative! $some_number"))
-  elseif BigInt(2) <= some_number
+  elseif TWO <= some_number
+    # I played around with adjusting the chunk size.  On my system,
+    # this value produced best or near-best results.
     chk_sz = BigInt(1625)
-    fac = calc_fac_impl(BigInt(1), some_number, chk_sz)
+    fac = calc_fac_impl(ONE, some_number, chk_sz)
   end
   return fac
 end
 
-function spawn_fac_impl(iterations, fac_me::BigInt)
-  for n = 1:iterations
-    calc_fac(fac_me)
-  end
-end
-
-
-function spawn_fac(iterations, fac_me::BigInt)
-  if (calc_fac(fac_me) == house_fac(fac_me)) && (0 < iterations)
-    @time(spawn_fac_impl(iterations, fac_me))
+function spawn_fac(iterations, fac_me::BigInt, calc_rslt)
+  if (calc_fac(fac_me) == calc_rslt && (0 < iterations))
+    print("timing spawn implementation: ")
+    @time(for n = 1:iterations calc_fac(fac_me) end)
   else
     throw(ArgumentError("calculation problem! $iterations, $fac_me"))
   end
@@ -101,4 +105,5 @@ end
 
 iterations = parseint(ARGS[1])
 fac_me = BigInt(ARGS[2])
-spawn_fac(iterations, fac_me)
+hf = house_fac(fac_me)
+spawn_fac(iterations, fac_me, hf)
